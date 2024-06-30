@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: myapp
-        image: farhinConatinerRegistry/azurecr.io/mycloudresume:v1
+        image: farhinacr1/azurecr.io/myapp/myapp-dp
         resources:
           limits:
             memory: "128Mi"
