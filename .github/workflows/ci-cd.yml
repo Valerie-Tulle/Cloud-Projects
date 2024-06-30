@@ -30,7 +30,8 @@ jobs:
                 # echo ${{secrets.AZURE_CLIENT_SECRET}} | docker login ${{secrets.ACR_NAME}}.azurecr.io --username client-id: ${{ secrets.AZURE_CLIENT_ID}} --password-stdin
             - name: Build & push docker image to ACR 
               run: |
-                docker build -t farhinACR.azurecr.io/myimage:${GITHUB_SHA::7} . docker login ${{secrets.ACR_NAME}}.azurecr.io -u ${{secrets.AZURE_CLIENT_ID}} -P ${{secrets.AZURE_CLIENT_SECRET}}
+                docker build -t farhinACR.azurecr.io/myimage:${GITHUB_SHA::7} . 
+                docker login ${{secrets.ACR_NAME}}.azurecr.io -u ${{secrets.AZURE_CLIENT_ID}} -P ${{secrets.AZURE_CLIENT_SECRET}}
                 docker push ${{secrets.ACR_NAME}}.azurecr.io/myimage:${GITHUB_SHA::7}
               env:
                 AZURE_CLIENT_ID: ${{secrets.AZURE_CLIENT_ID}}
