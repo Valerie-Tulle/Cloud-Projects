@@ -49,11 +49,11 @@ jobs:
 
             - name: Container Build & Push to ACR
               run: |
-                docker push farhinmirza/farhinacr1:${{env.IMAGE_TAG}}
+                docker push farhinacr1:${{env.IMAGE_TAG}}
             
             - name: Image uploaded to ACR
               run: |
-               echo "Image Uploaded : farhinmirza/farhinacr1:${{env.IMAGE_TAG}}"
+               echo "Image Uploaded : farhinacr1:${{env.IMAGE_TAG}}"
 
             - name: Connecting to AKS
               uses: azure/login@v1
@@ -74,7 +74,7 @@ jobs:
                 manifest: |
                   deployment.yml
                 images: |
-                  farhinmirza/farhinacr1:${{env.IMAGE_TAG}}
+                  farhinacr1:${{env.IMAGE_TAG}}
                 namespace: ns-dev
 
           
