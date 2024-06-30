@@ -22,7 +22,7 @@ spec:
       labels:
         app: myapp
   spec:
-      containers:
+    containers:
       - name: myapp
         image: farhinacr1.azureacr.io/ns-dev/myapp
         resources:
