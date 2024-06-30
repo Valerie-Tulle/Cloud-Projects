@@ -16,16 +16,15 @@ jobs:
             - name: Log in to AZURE
               uses: azure/login@v1
               with:
-                client-id: ${{ secrets.AZURE_CLIENT_ID}}
-                tenant-id: ${{ secrets.AZURE_TENANT_ID}}
-                client-secret: ${{secrets.AZURE_CLIENT_SECRET}}
+                creds: ${{secrets.AZURE_CREDENTIALS}}
 
             - name: Set up Docker Build 
               uses: docker/setup-buildx-action@v2
 
             - name: Login to ACR
               run: |
-                echo ${{secrets.ACR_NAME}}.azurecr.io/mycloudresume:v1 .
+                echo ${{secrets.AZURE_CLIENT_SECRET}} | docker login ${{secrets.ACR_NAME}}.azurecr.io --username client-id: ${{ secrets.AZURE_CLIENT_ID}} --password-stdin
+                docker build -t ${{secrets.ACR_NAME}}.azurecr.io/mycloudresume:v1
                 docker push ${{secrets.ACR_NAME}}.azurecr.io/mycloudresume:v1
 
                 - name: Set Up Kubectl 
