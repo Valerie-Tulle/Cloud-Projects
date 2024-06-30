@@ -24,7 +24,7 @@ spec:
      spec:
         containers:
           - name: myapp
-            image: farhinacr1.azureacr.io/ns-dev/myapp
+            image: farhinacr1.azureacr.io/
             resources:
               limits:
                 memory: "128Mi"
