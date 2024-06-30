@@ -63,7 +63,7 @@ jobs:
                 cluster-name: myAKSCluster
                 resource-group: aksResurceGroup
                 admin: 'false'
-                use-kubelogin: 'true'
+                # use-kubelogin: 'true'
 
             - name: Deploying image to AKS
               uses: azure/k8s-deploy@v1
