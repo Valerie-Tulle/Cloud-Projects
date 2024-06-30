@@ -6,15 +6,15 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: myapp
+      app: myapp-dp
   template:
     metadata:
       labels:
-        app: myapp
+        app: myapp-dp
     spec:
       containers:
-      - name: myapp
-        image: farhinacr1/azurecr.io/myapp/myapp-dp
+      - name: myapp-dp
+        image: farhinacr1.azureacr.io/
         resources:
           limits:
             memory: "128Mi"
@@ -31,7 +31,7 @@ metadata:
 spec:
   type: LoadBalancer
   selector:
-    app: myapp
+    app: myapp-dp
   ports:
   - protocol: TCP
     port: 8080
