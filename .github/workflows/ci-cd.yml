@@ -67,6 +67,6 @@ jobs:
 
             - name: Deploying image to AKS
               run: |
-                kubectl aply -f deployment.yml 
+                kubectl apply -f deployment.yml 
 
           
