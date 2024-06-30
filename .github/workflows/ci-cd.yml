@@ -28,19 +28,31 @@ jobs:
               env:
                 AZURE_CLI_PASSWORD: ${{secrets.AZURE_CLIENT_SECRET}}
                 # echo ${{secrets.AZURE_CLIENT_SECRET}} | docker login ${{secrets.ACR_NAME}}.azurecr.io --username client-id: ${{ secrets.AZURE_CLIENT_ID}} --password-stdin
-            - name: Build & push docker image 
+            - name: Build & push docker image to ACR 
               run: |
-                docker build -t ${{secrets.ACR_NAME}}.azurecr.io/mycloudresume:v1
-                docker push ${{secrets.ACR_NAME}}.azurecr.io/mycloudresume:v1
+                docker build -t farhinACR.azurecr.io/myimage:${GITHUB_SHA::7} . docker login ${{secrets.ACR_NAME}}.azurecr.io -u ${{secrets.AZURE_CLIENT_ID}} -P ${{secrets.AZURE_CLIENT_SECRET}}
+                docker push ${{secrets.ACR_NAME}}.azurecr.io/myimage:${GITHUB_SHA::7}
+              env:
+                AZURE_CLIENT_ID: ${{secrets.AZURE_CLIENT_ID}}
+                AZURE_CLIENT_SECRET: ${{secrets.AZURE_CLIENT_SECRET}}
 
-                - name: Set Up Kubectl 
-                  uses: azure/setup-kubectl@v3
-                  with:
-                    version: 'latest'
+            - name: Pull Docker Image from ACR 
+              run: |
+                docker login farhinACR.azurecr.io -u ${{secrets.AZURE_CLIENT_ID}} -p ${{secrets.AZURE_CLIENT_SECRET}}
+                docker pull farhinACR.azurecr.io/myimage:${GITHUB_SHA::7}
+              env:
+                AZURE_CLIENT_ID: ${{secrets.AZURE_CLIENT_ID}}
+                AZURE_CLIENT_SECRET: ${{secrets.AZURE_CLIENT_SECRET}}
 
-                - name: Get AKS credentials
-                  run: |
-                    az aks get-credentials --resource-group aksResurceGroup --name ns-dev
+
+            - name: Set Up Kubectl 
+              uses: azure/setup-kubectl@v3
+              with:
+                 version: 'latest'
+
+            - name: Get AKS credentials
+              run: |
+               az aks get-credentials --resource-group aksResurceGroup --name ns-dev
 
                 - name: Deploy to AKS 
                   run: |
