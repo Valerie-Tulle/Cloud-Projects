@@ -1,26 +1,37 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  annotations:
+    app_name: myapp
+    namespace: ns-dev
   name: myapp-dp
   namespace: ns-dev
+  labels:
+    app: myapp
 spec:
+  replicas: 1
   selector:
     matchLabels:
-      app: myapp-dp
+      app: myapp
   template:
-    metadata:
+     metadata:
+      annotations:
+        app_name: myapp
+        namespace: ns-dev
+      namespace: ns-dev
       labels:
-        app: myapp-dp
-    spec:
+        app: myapp
+  spec:
       containers:
-      - name: myapp-dp
-        image: farhinacr1.azureacr.io/
+      - name: myapp
+        image: farhinacr1.azureacr.io/ns-dev/myapp
         resources:
           limits:
             memory: "128Mi"
             cpu: "500m"
         ports:
         - containerPort: 8080
+          protocol: 'TCP"'
 
 ---
 
@@ -28,15 +39,15 @@ apiVersion: v1
 kind: Service
 metadata:
   name: myapp-svc
+  namespace: ns-dev
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
-    app: myapp-dp
+    app: myapp
   ports:
   - protocol: TCP
     port: 8080
     targetPort: 8080
-
 
 
 
