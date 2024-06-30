@@ -24,7 +24,7 @@ spec:
      spec:
         containers:
           - name: myapp
-            image: farhinacr1.azurecr.io/farhinacr1:
+            image: farhinacr1.azurecr.io/
             resources:
               limits:
                 memory: "128Mi"
