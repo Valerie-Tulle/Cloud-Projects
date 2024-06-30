@@ -66,12 +66,7 @@ jobs:
                 # use-kubelogin: 'true'
 
             - name: Deploying image to AKS
-              uses: azure/k8s-deploy@v1
-              with:
-                manifest: |
-                  deployment.yml
-                images: |
-                  farhinacr1.azurecr.io/farhinacr1:${{env.IMAGE_TAG}}
-                namespace: ns-dev
+              run: |
+                kubectl aply -f deployment.yml 
 
           
