@@ -65,73 +65,6 @@ jobs:
                 admin: 'false'
                 # use-kubelogin: 'true'
 
-            name: CI-CD Pipeline 
-env:
-  USER_NAME: ${{secrets.AZURE_CLIENT_ID}}
-  PASSWORD: ${{secrets.AZURE_CLIENT_SECRET}}
-  IMAGE_TAG: ${{github.sha}}-${{github.run_id}}-${{github.run_number}}
-
-on: 
-    push:
-        branches:
-            - main
-    workflow_dispatch: 
-      inputs:
-        action:
-          type: choice
-          required: true
-          default: dev
-          description: Deploy to 
-          options:
-            - dev
-
-permissions:
-  contents: read
-  packages: write
-  security-events: write
-  actions: read
-
-jobs:
-    build-and-deploy:
-        name: Build & Deploy   
-        runs-on: ubuntu-latest
-
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v2
-
-            - name: Connecting to Azure Container Registry(ACR)
-              uses: azure/docker-login@v1
-              with:
-                login-server: farhinacr1.azurecr.io
-                username: ${{env.USER_NAME}}
-                password: ${{env.PASSWORD}}
-
-            - name: Building docker image 
-              run: |
-                docker build -t farhinacr1.azurecr.io/farhinacr1:${{env.IMAGE_TAG}} .
-
-            - name: Container Build & Push to ACR
-              run: |
-                docker push farhinacr1.azurecr.io/farhinacr1:${{env.IMAGE_TAG}}
-            
-            - name: Image uploaded to ACR
-              run: |
-               echo "Image Uploaded : farhinacr1.azurecr.io/farhinacr1:${{env.IMAGE_TAG}}"
-
-            - name: Connecting to AKS
-              uses: azure/login@v1
-              with:
-                creds: ${{secrets.AZURE_CREDENTIALS}}
-
-            - name: Set the target AKS context cluster
-              uses: azure/aks-set-context@v2
-              with: 
-                cluster-name: myAKSCluster
-                resource-group: aksResurceGroup
-                admin: 'false'
-                # use-kubelogin: 'true'
-                
             - name: Deploy app to AKS
               uses: azure/k8s-deploy@v1
               with:
@@ -142,8 +75,5 @@ jobs:
                 imagepullsecrets: |
                   farhinacr1.azurecr.io-registry-connection
                 namespace: ns-dev
-
-          
-
 
           
