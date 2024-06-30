@@ -1,60 +1,80 @@
 name: CI-CD Pipeline 
+env:
+  USER_NAME: ${{secrets.AZURE_CLIENT_ID}}
+  PASSWORD: ${{secrets.AZURE_CLIENT_SECRET}}
+  IMAGE_TAG: ${{github.sha}}-${{github.run_id}}-${{github.run_number}}
 
 on: 
     push:
         branches:
             - main
     workflow_dispatch: 
+      inputs:
+        action:
+          type: choice
+          required: true
+          default: dev
+          description: Deploy to 
+          options:
+            - dev
+
+permissions:
+  contents: read
+  packages: write
+  security-events: write
+  actions: read
 
 jobs:
     build-and-deploy:
+        name: Build & Deploy   
         runs-on: ubuntu-latest
 
         steps:
             - name: Checkout code
               uses: actions/checkout@v2
 
-            - name: Log in to AZURE
+            - name: Connecting to Azure Container Registry(ACR)
+              uses: azure/docker-login@v1
+              with:
+                login-server: farhinACR.azurecr.io
+                username: ${{env.USER_NAME}}
+                password: ${{env.PASSWORD}}
+
+            - name: Creating docker image & uploading to ACR
+              uses: docker/build-push-action@v2
+              with:
+                context: .
+                push: false
+                tags: farhinACR/dev:${{env.IMAGE_TAG}}
+
+            - name: Container Build & Push to ACR
+              run: |
+                docker push farhinACR/dev:${{env.IMAGE_TAG}}
+            
+            - name: Image uploaded to ACR
+              run: |
+               echo "Image Uploaded :farhinACR/dev:${{env.IMAGE_TAG}}"
+
+            - name: Connecting to AKS
               uses: azure/login@v1
               with:
                 creds: ${{secrets.AZURE_CREDENTIALS}}
 
-            - name: Set up Docker Build 
-              uses: docker/setup-buildx-action@v2
+            - name: Set the target AKS context cluster
+              uses: azure/aks-set-context@v2
+              with: 
+                cluster-name: myAKSCluster
+                resource-group: aksResurceGroup
+                admin: 'false'
+                use-kubelogin: 'true'
 
-            - name: Login to ACR
-              run: |
-                az acr login --name farhinACR 
-              env:
-                AZURE_CLI_PASSWORD: ${{secrets.AZURE_CLIENT_SECRET}}
-                # echo ${{secrets.AZURE_CLIENT_SECRET}} | docker login ${{secrets.ACR_NAME}}.azurecr.io --username client-id: ${{ secrets.AZURE_CLIENT_ID}} --password-stdin
-            - name: Build & push docker image to ACR 
-              run: |
-                docker build -t farhinACR.azurecr.io/myimage:${GITHUB_SHA::7} . docker login ${{secrets.ACR_NAME}}.azurecr.io -u ${{secrets.AZURE_CLIENT_ID}} -P ${{secrets.AZURE_CLIENT_SECRET}}
-                docker push ${{secrets.ACR_NAME}}.azurecr.io/myimage:${GITHUB_SHA::7}
-              env:
-                AZURE_CLIENT_ID: ${{secrets.AZURE_CLIENT_ID}}
-                AZURE_CLIENT_SECRET: ${{secrets.AZURE_CLIENT_SECRET}}
-
-            - name: Pull Docker Image from ACR 
-              run: |
-                docker login farhinACR.azurecr.io -u ${{secrets.AZURE_CLIENT_ID}} -p ${{secrets.AZURE_CLIENT_SECRET}}
-                docker pull farhinACR.azurecr.io/myimage:${GITHUB_SHA::7}
-              env:
-                AZURE_CLIENT_ID: ${{secrets.AZURE_CLIENT_ID}}
-                AZURE_CLIENT_SECRET: ${{secrets.AZURE_CLIENT_SECRET}}
-
-
-            - name: Set Up Kubectl 
-              uses: azure/setup-kubectl@v3
+            - name: Deploying image to AKS
+              uses: azure/k8s-deploy@v1
               with:
-                 version: 'latest'
+                manifest: |
+                  deployment.yml
+                images: |
+                  farhinACR/dev:${{env.IMAGE_TAG}}
+                namespace: ns-dev
 
-            - name: Get AKS credentials
-              run: |
-               az aks get-credentials --resource-group aksResurceGroup --name ns-dev
-
-                - name: Deploy to AKS 
-                  run: |
-                  kubectl apply -f deployment.yml
-              
+          
