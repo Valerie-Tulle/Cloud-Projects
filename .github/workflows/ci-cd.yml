@@ -131,8 +131,7 @@ jobs:
                 resource-group: aksResurceGroup
                 admin: 'false'
                 # use-kubelogin: 'true'
-
-           # Deploy app to AKS
+                
             - name: Deploy app to AKS
               uses: azure/k8s-deploy@v1
               with:
