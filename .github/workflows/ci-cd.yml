@@ -42,7 +42,7 @@ jobs:
 
             - name: Building docker image 
               run: |
-                docker build -t farhinacr1.azurecr.io/farhinacr1:${{env.IMAGE_TAG}}
+                docker build -t farhinacr1.azurecr.io/farhinacr1:${{env.IMAGE_TAG}} .
 
             - name: Container Build & Push to ACR
               run: |
