@@ -15,23 +15,23 @@ spec:
       app: myapp
   template:
      metadata:
-      annotations:
-        app_name: myapp
-        namespace: ns-dev
-      namespace: ns-dev
-      labels:
-        app: myapp
-  spec:
-    containers:
-      - name: myapp
-        image: farhinacr1.azureacr.io/ns-dev/myapp
-        resources:
-          limits:
-            memory: "128Mi"
-            cpu: "500m"
-        ports:
-        - containerPort: 8080
-          protocol: 'TCP"'
+       annotations:
+         app_name: myapp
+         namespace: ns-dev
+       namespace: ns-dev
+       labels:
+         app: myapp
+     spec:
+        containers:
+          - name: myapp
+            image: farhinacr1.azureacr.io/ns-dev/myapp
+            resources:
+              limits:
+                memory: "128Mi"
+                cpu: "500m"
+            ports:
+              - containerPort: 8080
+                protocol: 'TCP'
 
 ---
 
