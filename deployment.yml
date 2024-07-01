@@ -41,7 +41,7 @@ metadata:
   name: myapp-svc
   namespace: ns-dev
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
     app: myapp
   ports:
